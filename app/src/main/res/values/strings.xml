@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">MultiTimer</string>
+
+    <string name="open_menu">Open menu</string>
+    <string name="change_directory">Change directory</string>
+    <string name="view_licenses">View licenses</string>
+
+    <string name="cancel">Cancel</string>
+    <string name="ok">OK</string>
+</resources>

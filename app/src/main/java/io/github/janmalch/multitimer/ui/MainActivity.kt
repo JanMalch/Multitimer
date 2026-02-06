@@ -11,6 +11,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.ui.Modifier
 import dagger.hilt.android.AndroidEntryPoint
+import io.github.janmalch.multitimer.ui.screens.main.MainScreen
 import io.github.janmalch.multitimer.ui.theme.MultiTimerTheme
 
 
@@ -26,7 +27,7 @@ class MainActivity : ComponentActivity() {
             MultiTimerTheme {
                 Scaffold { paddingValues ->
                     Box(modifier = Modifier.padding(paddingValues)) {
-                        Text("Hello")
+                        MainScreen()
                     }
                 }
             }

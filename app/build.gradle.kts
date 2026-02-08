@@ -123,6 +123,11 @@ dependencies {
     implementation(libs.bundles.coroutines)
     implementation(libs.kotlinx.datetime)
 
+    implementation(libs.androidx.navigation3.ui)
+    implementation(libs.androidx.navigation3.runtime)
+    implementation(libs.androidx.lifecycle.viewmodel.navigation3)
+    implementation(libs.androidx.hilt.navigation.compose)
+
     implementation(libs.bundles.hilt)
     ksp(libs.hilt.compiler)
     ksp(libs.hilt.android.compiler)

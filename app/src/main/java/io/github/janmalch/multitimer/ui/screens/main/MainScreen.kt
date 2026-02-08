@@ -19,6 +19,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -40,6 +41,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.toColorInt
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation3.runtime.NavKey
 import io.github.janmalch.multitimer.core.DurationFormat
 import io.github.janmalch.multitimer.core.Event
 import io.github.janmalch.multitimer.models.Timer
@@ -51,13 +54,24 @@ import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Instant
 
+data object MainScreen
+
 @Composable
-fun MainScreen(modifier: Modifier = Modifier) {
-    TimerText(
-        base = Duration.ZERO,
-        since = remember { Clock.System.now() },
-        isRunning = true,
-    )
+fun MainScreen(
+    viewModel: MainViewModel,
+    modifier: Modifier = Modifier
+) {
+    var mostRecentEvent: Event? = null
+    val timers by viewModel.timers.collectAsStateWithLifecycle()
+    Scaffold { paddingValues ->
+        MainScreen(
+            mostRecentEvent = mostRecentEvent,
+            timers = timers,
+            onStopClick = {},
+            onTimerClick = {},
+            modifier = modifier.padding(paddingValues),
+        )
+    }
 }
 
 @Composable

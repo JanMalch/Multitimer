@@ -128,6 +128,10 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.navigation3)
     implementation(libs.androidx.hilt.navigation.compose)
 
+    implementation(libs.room.runtime)
+    implementation(libs.room.ktx)
+    ksp(libs.room.compiler)
+
     implementation(libs.bundles.hilt)
     ksp(libs.hilt.compiler)
     ksp(libs.hilt.android.compiler)

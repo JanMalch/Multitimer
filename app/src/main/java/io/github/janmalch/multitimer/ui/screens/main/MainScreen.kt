@@ -61,14 +61,14 @@ fun MainScreen(
     viewModel: MainViewModel,
     modifier: Modifier = Modifier
 ) {
-    var mostRecentEvent: Event? = null
+    val mostRecentEvent by viewModel.mostRecentEvent.collectAsStateWithLifecycle()
     val timers by viewModel.timers.collectAsStateWithLifecycle()
     Scaffold { paddingValues ->
         MainScreen(
             mostRecentEvent = mostRecentEvent,
             timers = timers,
-            onStopClick = {},
-            onTimerClick = {},
+            onStopClick = { viewModel.addEvent(null) },
+            onTimerClick = { viewModel.addEvent(it.name) },
             modifier = modifier.padding(paddingValues),
         )
     }
@@ -100,16 +100,6 @@ private fun MainScreen(
         )
     }
 }
-
-// Source - https://stackoverflow.com/a/60479489
-// Posted by burkinafaso3741, modified by community. See post 'Timeline' for change history
-// Retrieved 2026-02-08, License - CC BY-SA 4.0
-private fun Color.Companion.fromTimer(timer: Timer): Color =
-    try {
-        Color(("#" + timer.color.trimStart('#')).toColorInt())
-    } catch (_: Exception) {
-        Color.Gray
-    }
 
 
 @Composable
@@ -211,6 +201,16 @@ private fun TimerText(
     }
     Text(format.format(elapsed))
 }
+
+// Source - https://stackoverflow.com/a/60479489
+// Posted by burkinafaso3741, modified by community. See post 'Timeline' for change history
+// Retrieved 2026-02-08, License - CC BY-SA 4.0
+private fun Color.Companion.fromTimer(timer: Timer): Color =
+    try {
+        Color(("#" + timer.color.trimStart('#')).toColorInt())
+    } catch (_: Exception) {
+        Color.Gray
+    }
 
 
 @Preview(showBackground = true, showSystemUi = true)

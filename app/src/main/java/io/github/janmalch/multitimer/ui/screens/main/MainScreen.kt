@@ -1,6 +1,5 @@
 package io.github.janmalch.multitimer.ui.screens.main
 
-import androidx.annotation.VisibleForTesting
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -11,18 +10,13 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.ListItem
-import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -30,27 +24,22 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
-import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.core.graphics.toColorInt
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation3.runtime.NavKey
 import io.github.janmalch.multitimer.R
 import io.github.janmalch.multitimer.core.DurationFormat
 import io.github.janmalch.multitimer.core.Event
@@ -74,14 +63,14 @@ fun MainScreen(
 ) {
     val mostRecentEvent by viewModel.mostRecentEvent.collectAsStateWithLifecycle()
     val timers by viewModel.timers.collectAsStateWithLifecycle()
-        MainScreen(
-            mostRecentEvent = mostRecentEvent,
-            timers = timers,
-            goToConfigScreen = goToConfigScreen,
-            onStopClick = { viewModel.addEvent(null) },
-            onTimerClick = { viewModel.addEvent(it.name) },
-            modifier = modifier,
-        )
+    MainScreen(
+        mostRecentEvent = mostRecentEvent,
+        timers = timers,
+        goToConfigScreen = goToConfigScreen,
+        onStopClick = { viewModel.addEvent(null) },
+        onTimerClick = { viewModel.addEvent(it.name) },
+        modifier = modifier,
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -111,26 +100,27 @@ private fun MainScreen(
             )
         }
     ) { paddingValues ->
-    Column(modifier = Modifier.padding(paddingValues)) {
+        Column(modifier = Modifier.padding(paddingValues)) {
 
-        Box(Modifier.padding(horizontal = 24.dp)) {
-        Button(
-            onClick = onStopClick,
-            enabled = mostRecentEvent?.timerName != null,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text(
-                text = "Stop",
+            Box(Modifier.padding(horizontal = 24.dp)) {
+                Button(
+                    onClick = onStopClick,
+                    enabled = mostRecentEvent?.timerName != null,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        text = "Stop",
+                    )
+                }
+            }
+
+            TimersColumn(
+                mostRecentEvent = mostRecentEvent,
+                timers = timers,
+                onTimerClick = onTimerClick,
+                modifier = Modifier.padding(vertical = 24.dp),
             )
-        }}
-
-        TimersColumn(
-            mostRecentEvent = mostRecentEvent,
-            timers = timers,
-            onTimerClick = onTimerClick,
-            modifier = Modifier.padding(vertical = 24.dp),
-        )
-    }
+        }
     }
 }
 

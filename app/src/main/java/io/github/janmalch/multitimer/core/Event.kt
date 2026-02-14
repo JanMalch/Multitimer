@@ -5,12 +5,10 @@ import androidx.room.Entity
 import androidx.room.Insert
 import androidx.room.PrimaryKey
 import androidx.room.Query
-import androidx.room.Upsert
 import kotlinx.coroutines.flow.Flow
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
-import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
 
@@ -27,7 +25,7 @@ data class Event(
         timerName: String?,
         timestamp: Instant,
         timeZone: TimeZone = TimeZone.currentSystemDefault(),
-    ): this(
+    ) : this(
         id = 0L,
         timerName = timerName,
         timestamp = timestamp,

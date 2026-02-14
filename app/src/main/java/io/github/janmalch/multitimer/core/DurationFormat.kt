@@ -1,6 +1,5 @@
 package io.github.janmalch.multitimer.core
 
-import androidx.annotation.VisibleForTesting
 import kotlin.time.Duration
 
 @JvmInline

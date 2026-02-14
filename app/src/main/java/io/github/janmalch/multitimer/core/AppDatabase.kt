@@ -30,7 +30,7 @@ object AppTypeConverters {
     version = 1,
 )
 abstract class AppDatabase : RoomDatabase() {
-   abstract fun eventDao(): EventDao
+    abstract fun eventDao(): EventDao
 
     companion object {
         fun create(context: Context, name: String = "app-database") = Room.databaseBuilder(

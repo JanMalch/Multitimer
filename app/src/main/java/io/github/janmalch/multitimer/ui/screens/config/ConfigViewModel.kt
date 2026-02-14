@@ -5,13 +5,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.github.janmalch.multitimer.core.ConfigRepository
-import io.github.janmalch.multitimer.core.EventRepository
-import io.github.janmalch.multitimer.models.Timer
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -38,7 +34,7 @@ class ConfigViewModel @Inject constructor(
                 configRepository.addTimer(name, color)
             } catch (e: CancellationException) {
                 throw e
-            }  catch (e: Exception) {
+            } catch (e: Exception) {
                 Log.e("ConfigViewModel", "Failed to add timer.", e)
                 _onTimerFailed.send(Unit)
             }

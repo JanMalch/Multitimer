@@ -4,7 +4,7 @@ import kotlinx.datetime.TimeZone
 import kotlin.time.Duration
 
 
-class Report (
+class Report(
     private val events: List<Event>,
     private val tz: TimeZone = TimeZone.currentSystemDefault()
 ) {

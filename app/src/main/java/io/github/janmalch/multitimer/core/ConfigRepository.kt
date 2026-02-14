@@ -1,6 +1,8 @@
 package io.github.janmalch.multitimer.core
 
 import android.content.Context
+import android.graphics.Color
+import android.util.Log
 import androidx.datastore.core.CorruptionException
 import androidx.datastore.core.IOException
 import androidx.datastore.core.Serializer
@@ -15,6 +17,8 @@ import javax.inject.Inject
 import io.github.janmalch.multitimer.models.Timer
 import java.io.InputStream
 import java.io.OutputStream
+import androidx.core.graphics.toColorInt
+import io.github.janmalch.multitimer.models.copy
 
 private object AppConfigSerializer : Serializer<AppConfig> {
     override val defaultValue: AppConfig = // AppConfig.getDefaultInstance()
@@ -23,19 +27,19 @@ private object AppConfigSerializer : Serializer<AppConfig> {
                 Timer.newBuilder()
                     .setName("Projekt A")
                     .setColor("#FF0000")
-                .build()
+                    .build()
             )
             .addTimer(
                 Timer.newBuilder()
                     .setName("Projekt B")
                     .setColor("#00FF00")
-                .build()
+                    .build()
             )
             .addTimer(
                 Timer.newBuilder()
                     .setName("Projekt C")
                     .setColor("#0000FF")
-                .build()
+                    .build()
             )
             .build()
 
@@ -64,4 +68,15 @@ class ConfigRepository @Inject constructor(
     val timers: Flow<List<Timer>> =
         context.appConfigStore.data.map { it.timerList.orEmpty() }.distinctUntilChanged()
 
+    suspend fun addTimer(name: String, color: String) {
+        require(name.isNotBlank()) {
+            "Timer name may not be blank, but got '$name'."
+        }
+        color.toColorInt()
+        context.appConfigStore.updateData {
+            it.copy {
+                timer.add(Timer.newBuilder().setName(name).setColor(color).build())
+            }
+        }
+    }
 }

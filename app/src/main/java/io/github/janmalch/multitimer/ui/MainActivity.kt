@@ -19,6 +19,7 @@ import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation3.ui.NavDisplay
 import dagger.hilt.android.AndroidEntryPoint
+import io.github.janmalch.multitimer.ui.screens.config.ConfigScreen
 import io.github.janmalch.multitimer.ui.screens.main.MainScreen
 import io.github.janmalch.multitimer.ui.theme.MultiTimerTheme
 
@@ -46,7 +47,16 @@ class MainActivity : ComponentActivity() {
                         when (key) {
                             is MainScreen -> NavEntry(key) {
                                 MainScreen(
-                                    viewModel = hiltViewModel()
+                                    goToConfigScreen = {
+                                        backStack.add(ConfigScreen)
+                                    }
+                                )
+                            }
+                            is ConfigScreen -> NavEntry(key) {
+                                ConfigScreen(
+                                    navigateUp = {
+                                        backStack.removeLastOrNull()
+                                    }
                                 )
                             }
 

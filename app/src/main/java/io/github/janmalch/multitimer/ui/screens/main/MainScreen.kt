@@ -14,14 +14,20 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
@@ -36,16 +42,20 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.toColorInt
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavKey
+import io.github.janmalch.multitimer.R
 import io.github.janmalch.multitimer.core.DurationFormat
 import io.github.janmalch.multitimer.core.Event
 import io.github.janmalch.multitimer.models.Timer
+import io.github.janmalch.multitimer.ui.components.TimerColorBox
 import io.github.janmalch.multitimer.ui.theme.MultiTimerTheme
 import kotlinx.coroutines.delay
 import kotlin.time.Clock
@@ -58,46 +68,69 @@ data object MainScreen
 
 @Composable
 fun MainScreen(
-    viewModel: MainViewModel,
-    modifier: Modifier = Modifier
+    goToConfigScreen: () -> Unit,
+    modifier: Modifier = Modifier,
+    viewModel: MainViewModel = hiltViewModel()
 ) {
     val mostRecentEvent by viewModel.mostRecentEvent.collectAsStateWithLifecycle()
     val timers by viewModel.timers.collectAsStateWithLifecycle()
-    Scaffold { paddingValues ->
         MainScreen(
             mostRecentEvent = mostRecentEvent,
             timers = timers,
+            goToConfigScreen = goToConfigScreen,
             onStopClick = { viewModel.addEvent(null) },
             onTimerClick = { viewModel.addEvent(it.name) },
-            modifier = modifier.padding(paddingValues),
+            modifier = modifier,
         )
-    }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun MainScreen(
     mostRecentEvent: Event?,
     timers: List<Timer>,
+    goToConfigScreen: () -> Unit,
     onStopClick: () -> Unit,
     onTimerClick: (Timer) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Column(modifier = modifier) {
+    Scaffold(
+        modifier = modifier,
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text(text = stringResource(R.string.app_name))
+                },
+                actions = {
+                    IconButton(
+                        onClick = goToConfigScreen
+                    ) {
+                        Icon(Icons.Filled.Settings, contentDescription = "Go to settings")
+                    }
+                }
+            )
+        }
+    ) { paddingValues ->
+    Column(modifier = Modifier.padding(paddingValues)) {
+
+        Box(Modifier.padding(horizontal = 24.dp)) {
         Button(
             onClick = onStopClick,
             enabled = mostRecentEvent?.timerName != null,
+            modifier = Modifier.fillMaxWidth()
         ) {
             Text(
                 text = "Stop",
             )
-        }
-        HorizontalDivider()
+        }}
+
         TimersColumn(
             mostRecentEvent = mostRecentEvent,
             timers = timers,
             onTimerClick = onTimerClick,
             modifier = Modifier.padding(vertical = 24.dp),
         )
+    }
     }
 }
 
@@ -133,11 +166,7 @@ private fun TimersColumn(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.weight(1f)
                 ) {
-                    Box(
-                        modifier = Modifier
-                            .size(32.dp)
-                            .background(Color.fromTimer(timer), RoundedCornerShape(4.dp))
-                    )
+                    TimerColorBox(timer)
                     Text(
                         text = timer.name,
                         overflow = TextOverflow.Ellipsis,
@@ -202,16 +231,6 @@ private fun TimerText(
     Text(format.format(elapsed))
 }
 
-// Source - https://stackoverflow.com/a/60479489
-// Posted by burkinafaso3741, modified by community. See post 'Timeline' for change history
-// Retrieved 2026-02-08, License - CC BY-SA 4.0
-private fun Color.Companion.fromTimer(timer: Timer): Color =
-    try {
-        Color(("#" + timer.color.trimStart('#')).toColorInt())
-    } catch (_: Exception) {
-        Color.Gray
-    }
-
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
@@ -228,6 +247,7 @@ private fun MainScreenPreview() {
             onStopClick = {
                 mostRecentEvent = Event(timerName = null, timestamp = Clock.System.now())
             },
+            goToConfigScreen = {},
             onTimerClick = { timer ->
                 mostRecentEvent = Event(
                     timerName = timer.name.takeUnless { it == mostRecentEvent?.timerName },

@@ -67,6 +67,7 @@ class ConfigRepository @Inject constructor(
 
     val timers: Flow<List<Timer>> =
         context.appConfigStore.data.map { it.timerList.orEmpty() }.distinctUntilChanged()
+            .map { list -> list.sortedBy { it.name } }
 
     suspend fun addTimer(name: String, color: String) {
         require(name.isNotBlank()) {

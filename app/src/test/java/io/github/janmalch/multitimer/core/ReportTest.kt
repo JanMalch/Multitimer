@@ -1,6 +1,5 @@
 package io.github.janmalch.multitimer.core
 
-import kotlinx.datetime.TimeZone
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import kotlin.time.Instant
@@ -14,7 +13,8 @@ class ReportTest {
             Event("B", Instant.fromEpochSeconds(1)),
             Event("A", Instant.fromEpochSeconds(5)),
             Event(null, Instant.fromEpochSeconds(10)),
-        ), TimeZone.UTC)
+        )
+        )
         assertEquals("""
             2 timers:
             - A for 6s
@@ -35,6 +35,13 @@ class ReportTest {
     }
 
     @Test
+    fun `should work with an empty list`() {
+        val report = Report(emptyList())
+        assertEquals(0, report.sections.size)
+        assertEquals("0 events", report.toTextReport())
+    }
+
+    @Test
     fun `should work with break in between`() {
         val report = Report(listOf(
             Event("A", Instant.fromEpochSeconds(0)),
@@ -44,7 +51,8 @@ class ReportTest {
             Event("B", Instant.fromEpochSeconds(15)),
             Event("C", Instant.fromEpochSeconds(25)),
             Event(null, Instant.fromEpochSeconds(35)),
-        ), TimeZone.UTC)
+        )
+        )
         assertEquals("""
             3 timers:
             - A for 6s

@@ -1,13 +1,31 @@
 package io.github.janmalch.multitimer.core
 
-import kotlinx.datetime.TimeZone
 import kotlin.time.Duration
 
 
 class Report(
     private val events: List<Event>,
-    private val tz: TimeZone = TimeZone.currentSystemDefault()
 ) {
+
+    val sections: List<Pair<String, Duration>> = run {
+        if (events.isEmpty()) return@run emptyList()
+
+        val pairs = mutableListOf<Pair<String, Duration>>()
+        var current = events.first().timestamp
+        for ((i, event) in events.withIndex()) {
+            if (i == 0) continue
+            val currentName = events[i - 1].timerName
+            if (currentName != null) {
+                pairs += currentName to (event.timestamp - current)
+            }
+            current = event.timestamp
+        }
+        pairs.toList()
+    }
+
+    val totalByTimer: Map<String, Duration> = sections.groupBy { it.first }.map { entry ->
+        entry.key to entry.value.fold(Duration.ZERO) { acc, section -> acc + section.second }
+    }.toMap()
 
     fun toTextReport(): String {
         if (events.isEmpty()) return "0 events"
@@ -19,21 +37,7 @@ class Report(
             return sb.toString()
         }
 
-        val sections = mutableListOf<Pair<String, Duration>>()
-        var current = events.first().timestamp
-        for ((i, event) in events.withIndex()) {
-            if (i == 0) continue
-            val currentName = events[i - 1].timerName
-            if (currentName != null) {
-                sections += currentName to (event.timestamp - current)
-            }
-            current = event.timestamp
-        }
-        val summaries = sections.groupBy { it.first }.map { entry ->
-            entry.key to entry.value.fold(Duration.ZERO) { acc, section -> acc + section.second }
-        }.sortedBy { it.first }
-
-
+        val summaries = totalByTimer.entries.sortedBy { it.key }
         sb.appendLine("${summaries.size} timers:")
         for ((timer, duration) in summaries) {
             sb.appendLine("- $timer for $duration")

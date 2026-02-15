@@ -4,8 +4,8 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.github.janmalch.multitimer.core.ConfigRepository
 import io.github.janmalch.multitimer.core.EventRepository
+import io.github.janmalch.multitimer.core.TodaysTimersUseCase
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
@@ -20,14 +20,14 @@ import javax.inject.Inject
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class MainViewModel @Inject constructor(
-    private val configRepository: ConfigRepository,
+    private val todaysTimersUseCase: TodaysTimersUseCase,
     private val eventRepository: EventRepository,
 ) : ViewModel() {
 
     private val _onEventFailed = Channel<Unit>()
     val onEventFailed = _onEventFailed.receiveAsFlow()
 
-    val timers = configRepository.timers
+    val timers = todaysTimersUseCase()
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5_000),

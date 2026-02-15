@@ -43,6 +43,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.github.janmalch.multitimer.R
 import io.github.janmalch.multitimer.core.DurationFormat
 import io.github.janmalch.multitimer.core.Event
+import io.github.janmalch.multitimer.core.TodaysTimer
 import io.github.janmalch.multitimer.models.Timer
 import io.github.janmalch.multitimer.ui.components.TimerColorBox
 import io.github.janmalch.multitimer.ui.theme.MultiTimerTheme
@@ -77,7 +78,7 @@ fun MainScreen(
 @Composable
 private fun MainScreen(
     mostRecentEvent: Event?,
-    timers: List<Timer>,
+    timers: List<TodaysTimer>,
     goToConfigScreen: () -> Unit,
     onStopClick: () -> Unit,
     onTimerClick: (Timer) -> Unit,
@@ -128,7 +129,7 @@ private fun MainScreen(
 @Composable
 private fun TimersColumn(
     mostRecentEvent: Event?,
-    timers: List<Timer>,
+    timers: List<TodaysTimer>,
     onTimerClick: (Timer) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -146,28 +147,27 @@ private fun TimersColumn(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(shape)
-                    .clickable(onClick = { onTimerClick(timer) })
+                    .clickable(onClick = { onTimerClick(timer.timer) })
                     .background(MaterialTheme.colorScheme.surface, shape)
                     .padding(vertical = 12.dp, horizontal = 16.dp),
             ) {
-                val isRunning = mostRecentEvent?.timerName == timer.name
+                val isRunning = mostRecentEvent?.timerName == timer.timer.name
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(16.dp),
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.weight(1f)
                 ) {
-                    TimerColorBox(timer)
+                    TimerColorBox(timer.timer)
                     Text(
-                        text = timer.name,
+                        text = timer.timer.name,
                         overflow = TextOverflow.Ellipsis,
                         maxLines = 1,
                         fontWeight = FontWeight.Bold.takeIf { isRunning },
                     )
                 }
                 TimerText(
-                    base = Duration.ZERO,
-                    since = remember { Clock.System.now() },
-                    isRunning = isRunning,
+                    base = timer.recorded,
+                    runningSince = mostRecentEvent?.timestamp?.takeIf { isRunning },
                 )
             }
             Spacer(Modifier.height(1.dp))
@@ -183,9 +183,18 @@ private fun TimersColumnPreview() {
             TimersColumn(
                 mostRecentEvent = null,
                 timers = listOf(
-                    Timer.newBuilder().setName("A").setColor("#FF0000").build(),
-                    Timer.newBuilder().setName("B").setColor("#00FF00").build(),
-                    Timer.newBuilder().setName("C").setColor("#0000FF").build(),
+                    TodaysTimer(
+                        Timer.newBuilder().setName("A").setColor("#FF0000").build(),
+                        Duration.ZERO
+                    ),
+                    TodaysTimer(
+                        Timer.newBuilder().setName("B").setColor("#00FF00").build(),
+                        Duration.ZERO
+                    ),
+                    TodaysTimer(
+                        Timer.newBuilder().setName("C").setColor("#0000FF").build(),
+                        Duration.ZERO
+                    ),
                 ),
                 onTimerClick = {},
                 modifier = Modifier.padding(24.dp),
@@ -202,19 +211,18 @@ private fun durationSaver(): Saver<Duration, Long> = Saver(
 @Composable
 private fun TimerText(
     base: Duration,
-    since: Instant,
-    isRunning: Boolean,
+    runningSince: Instant?,
     clock: Clock = remember { Clock.System },
     format: DurationFormat = remember { DurationFormat("1:23:45") }
 ) {
     var elapsed by rememberSaveable(base, stateSaver = durationSaver()) { mutableStateOf(base) }
-    LaunchedEffect(isRunning, since, base) {
-        if (!isRunning) {
+    LaunchedEffect(runningSince, base) {
+        if (runningSince == null) {
             elapsed = base
             return@LaunchedEffect
         }
-        while (isRunning) {
-            elapsed = ((clock.now() - since) + base)
+        while (runningSince != null) {
+            elapsed = ((clock.now() - runningSince) + base)
             delay(200)
         }
     }
@@ -230,9 +238,18 @@ private fun MainScreenPreview() {
         MainScreen(
             mostRecentEvent = mostRecentEvent,
             timers = listOf(
-                Timer.newBuilder().setName("A").setColor("#FF0000").build(),
-                Timer.newBuilder().setName("B").setColor("#00FF00").build(),
-                Timer.newBuilder().setName("C").setColor("#0000FF").build(),
+                TodaysTimer(
+                    Timer.newBuilder().setName("A").setColor("#FF0000").build(),
+                    Duration.ZERO
+                ),
+                TodaysTimer(
+                    Timer.newBuilder().setName("B").setColor("#00FF00").build(),
+                    Duration.ZERO
+                ),
+                TodaysTimer(
+                    Timer.newBuilder().setName("C").setColor("#0000FF").build(),
+                    Duration.ZERO
+                ),
             ),
             onStopClick = {
                 mostRecentEvent = Event(timerName = null, timestamp = Clock.System.now())
@@ -255,8 +272,7 @@ private fun TimerTextFromZeroRunningPreview() {
     MultiTimerTheme {
         TimerText(
             base = Duration.ZERO,
-            since = remember { Clock.System.now() },
-            isRunning = false,
+            runningSince = remember { Clock.System.now() },
         )
     }
 }
@@ -267,8 +283,7 @@ private fun TimerTextFromZeroNotRunningPreview() {
     MultiTimerTheme {
         TimerText(
             base = Duration.ZERO,
-            since = remember { Clock.System.now() },
-            isRunning = true,
+            runningSince = null,
         )
     }
 }
@@ -279,8 +294,7 @@ private fun TimerTextFromOneHourRunningPreview() {
     MultiTimerTheme {
         TimerText(
             base = 1.hours,
-            since = remember { Clock.System.now() },
-            isRunning = true,
+            runningSince = remember { Clock.System.now() },
         )
     }
 }
@@ -291,8 +305,7 @@ private fun TimerTextFromOneHourNotRunningPreview() {
     MultiTimerTheme {
         TimerText(
             base = 1.hours,
-            since = remember { Clock.System.now() },
-            isRunning = false,
+            runningSince = null,
         )
     }
 }

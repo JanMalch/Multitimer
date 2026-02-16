@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.com.google.devtools.ksp)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.com.google.protobuf)
+    alias(libs.plugins.room)
     id("com.google.android.gms.oss-licenses-plugin")
 }
 
@@ -85,6 +86,10 @@ kotlin {
     compilerOptions {
         optIn.add("kotlin.time.ExperimentalTime")
     }
+}
+
+room {
+    schemaDirectory("$projectDir/schemas")
 }
 
 protobuf {

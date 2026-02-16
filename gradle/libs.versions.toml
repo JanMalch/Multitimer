@@ -76,6 +76,7 @@ compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "
 com-google-dagger-hilt-android = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 com-google-devtools-ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 com-google-protobuf = { id = "com.google.protobuf", version.ref = "protobuf-plugin" }
+room = { id = "androidx.room", version.ref = "room" }
 
 [bundles]
 ui = ["activity-compose", "ui", "ui-graphics", "ui-tooling-preview", "material3", "ui-icons"]

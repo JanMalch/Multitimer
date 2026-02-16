@@ -38,7 +38,7 @@ jobs:
         uses: timheuer/base64-to-file@v1.2
         with:
           fileName: 'android_keystore.jks'
-          fileDir: '/home/runner/work/MultiTimer/MultiTimer/app/keystore/'
+          fileDir: './app/keystore/'
           encodedString: ${{ secrets.KEYSTORE }}
 
       # TODO: include baseline profile generation

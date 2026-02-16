@@ -19,27 +19,7 @@ import java.io.OutputStream
 import javax.inject.Inject
 
 private object AppConfigSerializer : Serializer<AppConfig> {
-    override val defaultValue: AppConfig = // AppConfig.getDefaultInstance()
-        AppConfig.newBuilder()
-            .addTimer(
-                Timer.newBuilder()
-                    .setName("Projekt A")
-                    .setColor("#FF0000")
-                    .build()
-            )
-            .addTimer(
-                Timer.newBuilder()
-                    .setName("Projekt B")
-                    .setColor("#00FF00")
-                    .build()
-            )
-            .addTimer(
-                Timer.newBuilder()
-                    .setName("Projekt C")
-                    .setColor("#0000FF")
-                    .build()
-            )
-            .build()
+    override val defaultValue: AppConfig = AppConfig.getDefaultInstance()
 
     override suspend fun readFrom(input: InputStream): AppConfig {
         try {

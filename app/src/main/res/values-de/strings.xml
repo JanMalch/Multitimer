@@ -6,6 +6,7 @@
     <string name="change_directory">Ordner ändern</string>
     <string name="view_licenses">Lizenzen ansehen</string>
 
+    <string name="delete">Löschen</string>
     <string name="cancel">Abbrechen</string>
     <string name="ok">OK</string>
 </resources>

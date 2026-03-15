@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.github.janmalch.multitimer.core.ConfigRepository
+import io.github.janmalch.multitimer.models.Timer
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.SharingStarted
@@ -36,6 +37,19 @@ class ConfigViewModel @Inject constructor(
                 throw e
             } catch (e: Exception) {
                 Log.e("ConfigViewModel", "Failed to add timer.", e)
+                _onTimerFailed.send(Unit)
+            }
+        }
+    }
+
+    fun deleteTimer(timer: Timer) {
+        viewModelScope.launch {
+            try {
+                configRepository.deleteTimer(timer.name)
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                Log.e("ConfigViewModel", "Failed to delete timer.", e)
                 _onTimerFailed.send(Unit)
             }
         }

@@ -58,4 +58,13 @@ class ConfigRepository @Inject constructor(
             }
         }
     }
+
+    suspend fun deleteTimer(name: String) {
+        context.appConfigStore.updateData { appConfig ->
+            appConfig.copy {
+                timer.clear()
+                timer.addAll(appConfig.timerList.orEmpty().filter { it.name != name })
+            }
+        }
+    }
 }

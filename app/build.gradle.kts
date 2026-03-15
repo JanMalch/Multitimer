@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 @Suppress("DSL_SCOPE_VIOLATION") // TODO: Remove once KTIJ-19369 is fixed
 plugins {
     alias(libs.plugins.com.android.application)
@@ -62,12 +64,8 @@ android {
         }
     }
     compileOptions {
-        // Java 17 for landscapist: https://github.com/skydoves/landscapist/issues/298#issuecomment-1569903376
-        sourceCompatibility = JavaVersion.VERSION_18
-        targetCompatibility = JavaVersion.VERSION_18
-    }
-    kotlinOptions {
-        jvmTarget = "18"
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
     buildFeatures {
         buildConfig = true
@@ -84,6 +82,7 @@ android {
 
 kotlin {
     compilerOptions {
+        jvmTarget = JvmTarget.JVM_11
         optIn.add("kotlin.time.ExperimentalTime")
     }
 }

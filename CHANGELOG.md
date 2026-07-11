@@ -1,6 +1,17 @@
 <!-- ROAR:UPCOMING:START -->
-[Upcoming Changes …](https://github.com/JanMalch/Multitimer/compare/v0.2.0...main)
+[Upcoming Changes …](https://github.com/JanMalch/Multitimer/compare/v0.3.0...main)
 <!-- ROAR:UPCOMING:END -->
+
+## [0.3.0](https://github.com/JanMalch/Multitimer/tree/v0.3.0) - July 11, 2026
+
+**Full Changelog:** [`v0.2.0...v0.3.0`](https://github.com/JanMalch/Multitimer/compare/v0.2.0...v0.3.0)
+
+| type | description | commit |
+|---|---|---|
+| feat | add total timer at the top | [`7210d5f2`](https://github.com/JanMalch/Multitimer/commit/7210d5f28ead1ad1113a2d4095bc91342e46044b) |
+
+
+
 
 ## [0.2.0](https://github.com/JanMalch/Multitimer/tree/v0.2.0) - March 15, 2026
 

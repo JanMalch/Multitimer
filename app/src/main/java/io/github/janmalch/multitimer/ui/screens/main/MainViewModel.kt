@@ -10,6 +10,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.github.janmalch.multitimer.core.EventRepository
 import io.github.janmalch.multitimer.core.Report
+import io.github.janmalch.multitimer.core.Today
 import io.github.janmalch.multitimer.core.TodaysTimersUseCase
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
@@ -48,7 +49,7 @@ class MainViewModel @Inject constructor(
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5_000),
-            initialValue = emptyList(),
+            initialValue = Today.empty(),
         )
 
     val mostRecentEvent = eventRepository.todaysEvents().map { it.lastOrNull() }

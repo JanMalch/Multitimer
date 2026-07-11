@@ -20,6 +20,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -38,7 +39,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -47,6 +50,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.github.janmalch.multitimer.R
 import io.github.janmalch.multitimer.core.DurationFormat
 import io.github.janmalch.multitimer.core.Event
+import io.github.janmalch.multitimer.core.Today
 import io.github.janmalch.multitimer.core.TodaysTimer
 import io.github.janmalch.multitimer.models.Timer
 import io.github.janmalch.multitimer.ui.components.CollectAsEvent
@@ -68,7 +72,7 @@ fun MainScreen(
     viewModel: MainViewModel = hiltViewModel()
 ) {
     val mostRecentEvent by viewModel.mostRecentEvent.collectAsStateWithLifecycle()
-    val timers by viewModel.timers.collectAsStateWithLifecycle()
+    val today by viewModel.timers.collectAsStateWithLifecycle()
     val context = LocalContext.current
     CollectAsEvent(viewModel.onShareIntent) {
         try {
@@ -80,7 +84,7 @@ fun MainScreen(
 
     MainScreen(
         mostRecentEvent = mostRecentEvent,
-        timers = timers,
+        today = today,
         goToConfigScreen = goToConfigScreen,
         onShareReport = { viewModel.shareReport() },
         onStopClick = { viewModel.addEvent(null) },
@@ -93,7 +97,7 @@ fun MainScreen(
 @Composable
 private fun MainScreen(
     mostRecentEvent: Event?,
-    timers: List<TodaysTimer>,
+    today: Today,
     goToConfigScreen: () -> Unit,
     onShareReport: () -> Unit,
     onStopClick: () -> Unit,
@@ -123,6 +127,14 @@ private fun MainScreen(
         }
     ) { paddingValues ->
         Column(modifier = Modifier.padding(paddingValues)) {
+            TimerText(
+                base = today.total,
+                runningSince = mostRecentEvent?.timestamp?.takeIf { mostRecentEvent.timerName != null },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 24.dp, end = 24.dp, bottom = 8.dp),
+                style = MaterialTheme.typography.titleLarge.copy(textAlign = TextAlign.Center),
+            )
 
             Box(Modifier.padding(horizontal = 24.dp)) {
                 Button(
@@ -138,7 +150,7 @@ private fun MainScreen(
 
             TimersColumn(
                 mostRecentEvent = mostRecentEvent,
-                timers = timers,
+                timers = today.timers,
                 onTimerClick = onTimerClick,
                 modifier = Modifier.padding(vertical = 24.dp),
             )
@@ -233,8 +245,10 @@ private fun durationSaver(): Saver<Duration, Long> = Saver(
 private fun TimerText(
     base: Duration,
     runningSince: Instant?,
+    modifier: Modifier = Modifier,
+    style: TextStyle = LocalTextStyle.current,
     clock: Clock = remember { Clock.System },
-    format: DurationFormat = remember { DurationFormat("1:23:45") }
+    format: DurationFormat = remember { DurationFormat("1:23:45") },
 ) {
     var elapsed by rememberSaveable(base, stateSaver = durationSaver()) { mutableStateOf(base) }
     LaunchedEffect(runningSince, base) {
@@ -247,7 +261,7 @@ private fun TimerText(
             delay(200)
         }
     }
-    Text(format.format(elapsed))
+    Text(format.format(elapsed), modifier, style = style)
 }
 
 
@@ -258,7 +272,8 @@ private fun MainScreenPreview() {
     MultiTimerTheme {
         MainScreen(
             mostRecentEvent = mostRecentEvent,
-            timers = listOf(
+            today = Today(
+                timers = listOf(
                 TodaysTimer(
                     Timer.newBuilder().setName("A").setColor("#FF0000").build(),
                     Duration.ZERO
@@ -271,6 +286,7 @@ private fun MainScreenPreview() {
                     Timer.newBuilder().setName("C").setColor("#0000FF").build(),
                     Duration.ZERO
                 ),
+                ), total = Duration.ZERO
             ),
             onStopClick = {
                 mostRecentEvent = Event(timerName = null, timestamp = Clock.System.now())

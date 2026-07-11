@@ -14,6 +14,15 @@ data class TodaysTimer(
     val recorded: Duration
 )
 
+data class Today(
+    val timers: List<TodaysTimer>,
+    val total: Duration,
+) {
+    companion object {
+        fun empty() = Today(emptyList(), Duration.ZERO)
+    }
+}
+
 class TodaysTimersUseCase(
     private val configRepository: ConfigRepository,
     private val eventRepository: EventRepository,
@@ -26,14 +35,16 @@ class TodaysTimersUseCase(
     ) : this(configRepository, eventRepository, Dispatchers.Default)
 
 
-    operator fun invoke(): Flow<List<TodaysTimer>> =
+    operator fun invoke(): Flow<Today> =
         combine(configRepository.timers, eventRepository.todaysEvents()) { timers, events ->
             val report = Report(events)
-            timers.map {
+            var total = Duration.ZERO
+            val todaysTimers = timers.map {
                 TodaysTimer(
                     timer = it,
-                    recorded = report.totalByTimer[it.name] ?: Duration.ZERO
+                    recorded = report.totalByTimer[it.name]?.also { total += it } ?: Duration.ZERO
                 )
             }
+            Today(todaysTimers, total)
         }.flowOn(dispatcher)
 }
